@@ -35,10 +35,14 @@ jobs:
           subscriptionId: 9f91d3ca-747b-4642-a795-c40a3d1f7bfd
           region: East US
           template: ./arm-templates/resourcegroup.json
+          parameters: 
+            location=eastus
+            resourceGroupName=rg-githubactions
           deploymentName: rg-githubactions
       
       - name: Deploy Storage Account
         uses: Azure/arm-deploy@v2
+        id: storageAccountDeploy
         with:
           scope: resourcegroup
           resourceGroupName: rg-githubactions
@@ -51,6 +55,9 @@ jobs:
             location="westus"
             # above paramters specified explicitly  
           deploymentMode: incremental
+
+      - run: echo ${{ steps.storageAccountDeploy.outputs.BlobUri }}
+      
 
       # - name: Deploy Resource Group rg-githubactions with AZ CLI
       #   uses: Azure/cli@v2.0.0
