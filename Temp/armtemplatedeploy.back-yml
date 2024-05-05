@@ -10,26 +10,17 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Variable definition at Workflow level 
 env:
+  resource_group_name: rg-githubactions
+  location: eastus
   subscriptionId: 9f91d3ca-747b-4642-a795-c40a3d1f7bfd
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  armDeployStaging:
-    name: Deploy to Staging
+  armDeploy:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    # Varable definition with in a job
-    env:
-      resource_group_name: rg-stg-githubactions
-      location: eastus
-
-    # GitHub environment
-    environment:
-      name: staging
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -84,78 +75,12 @@ jobs:
             location=${{ env.location }}
           deploymentMode: incremental
 
-  armDeployProduction:
-    name: Deploy to Production
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # Varable definition with in a job
-    env:
-      resource_group_name: rg-prod-githubactions
-      location: westus
-
-    # Github environment  
-    environment:
-      name: production
-    
-    # needs the staging job to be succesful before running this job
-    needs: armDeployStaging
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
-
-      - name: Azure Login
-        uses: Azure/login@v1
-        # with is input
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Deploy Resource Group ${{ env.resource_group_name }}
-        uses: Azure/arm-deploy@v2
-        with:
-          scope: subscription
-          subscriptionId: ${{ env.subscriptionId }}
-          region: ${{ env.location }}
-          template: ./arm-templates/resourcegroup.json
-          parameters: 
-            location=${{ env.location }}
-            resourceGroupName=${{ env.resource_group_name }}
-          deploymentName: ${{ env.resource_group_name }}
-      
-      - name: Deploy Storage Account
-        uses: Azure/arm-deploy@v2
-        id: storageAccountDeploy
-        with:
-          scope: resourcegroup
-          resourceGroupName: ${{ env.resource_group_name }}
-          subscriptionId: ${{ env.subscriptionId }}
-          template: ./arm-templates/storageaccount.json
-          parameters: 
-             # parameters from parameters file
-            ./arm-templates/storageaccount.parameters.json
-            storageAccountName=globoprod811002
-            location=${{ env.location }}
-            # above paramters specified explicitly  
-          deploymentMode: incremental
-
-      - run: echo ${{ steps.storageAccountDeploy.outputs.BlobUri }}
-      
-      - name: Deploy Virtual Machine
-        uses: Azure/arm-deploy@v2
-        with:
-          scope: resourcegroup
-          resourceGroupName: ${{ env.resource_group_name }}
-          subscriptionId: ${{ env.subscriptionId }}
-          template: ./arm-templates/virtualmachine.json
-          parameters: 
-            adminPassword=${{ secrets.UBUNTU_ADMIN_PASSWORD }}
-            location=${{ env.location }}
-          deploymentMode: incremental            
-
       # - name: Deploy Resource Group rg-githubactions with AZ CLI 'test'
       #   uses: Azure/cli@v2.0.0
       #   with:
       #       inlineScript: |
       #         az deployment sub create --location "eastus" --template-file  ./arm-templates/resourcegroup.json
+
+
+            
+
