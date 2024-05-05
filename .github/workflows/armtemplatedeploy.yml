@@ -92,7 +92,7 @@ jobs:
     # Varable definition with in a job
     env:
       resource_group_name: rg-prod-githubactions
-      location: westus2
+      location: southcentralus
 
     # Github environment  
     environment:
