@@ -10,6 +10,11 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  resource_group_name: rg-githubactions
+  location: eastus
+  subscriptionId: 9f91d3ca-747b-4642-a795-c40a3d1f7bfd
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -28,31 +33,31 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy Resource Group rg-githubactions
+      - name: Deploy Resource Group ${{ env.resource_group_name }}
         uses: Azure/arm-deploy@v2
         with:
           scope: subscription
-          subscriptionId: 9f91d3ca-747b-4642-a795-c40a3d1f7bfd
-          region: East US
+          subscriptionId: ${{ env.subscriptionId }}
+          region: ${{ env.location }}
           template: ./arm-templates/resourcegroup.json
           parameters: 
-            location=eastus
-            resourceGroupName=rg-githubactions
-          deploymentName: rg-githubactions
+            location=${{ env.location }}
+            resourceGroupName=${{ env.resource_group_name }}
+          deploymentName: ${{ env.resource_group_name }}
       
       - name: Deploy Storage Account
         uses: Azure/arm-deploy@v2
         id: storageAccountDeploy
         with:
           scope: resourcegroup
-          resourceGroupName: rg-githubactions
-          subscriptionId: 9f91d3ca-747b-4642-a795-c40a3d1f7bfd
+          resourceGroupName: ${{ env.resource_group_name }}
+          subscriptionId: ${{ env.subscriptionId }}
           template: ./arm-templates/storageaccount.json
           parameters: 
              # parameters from parameters file
             ./arm-templates/storageaccount.parameters.json
             storageAccountName=globostg811002
-            location="westus"
+            location=${{ env.location }}
             # above paramters specified explicitly  
           deploymentMode: incremental
 
@@ -62,11 +67,12 @@ jobs:
         uses: Azure/arm-deploy@v2
         with:
           scope: resourcegroup
-          resourceGroupName: rg-githubactions
-          subscriptionId: 9f91d3ca-747b-4642-a795-c40a3d1f7bfd
+          resourceGroupName: ${{ env.resource_group_name }}
+          subscriptionId: ${{ env.subscriptionId }}
           template: ./arm-templates/virtualmachine.json
           parameters: 
             adminPassword=${{ secrets.UBUNTU_ADMIN_PASSWORD }}
+            location=${{ env.location }}
           deploymentMode: incremental
 
       # - name: Deploy Resource Group rg-githubactions with AZ CLI 'test'
