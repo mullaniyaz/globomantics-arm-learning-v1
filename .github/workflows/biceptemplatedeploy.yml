@@ -82,7 +82,7 @@ jobs:
         uses: Azure/arm-deploy@v1
         with:
             scope: resourcegroup
-            resourceGroupName: ${{ env.subscription }}
+            resourceGroupName: ${{ env.resource_group_name}}
             subscriptionId: ${{ env.subscription }}
             template: ./bicep-templates/virtualnetwork.bicep
             parameters:
