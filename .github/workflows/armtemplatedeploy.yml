@@ -58,6 +58,16 @@ jobs:
 
       - run: echo ${{ steps.storageAccountDeploy.outputs.BlobUri }}
       
+      - name: Deploy Virtual Machine
+        uses: Azure/arm-deploy@v2
+        with:
+          scope: resourcegroup
+          resourceGroupName: rg-githubactions
+          subscriptionId: 9f91d3ca-747b-4642-a795-c40a3d1f7bfd
+          template: ./arm-templates/virtualmachine.json
+          parameters: 
+            adminPassword="My$ecureP@ssword!"
+          deploymentMode: incremental
 
       # - name: Deploy Resource Group rg-githubactions with AZ CLI 'test'
       #   uses: Azure/cli@v2.0.0
