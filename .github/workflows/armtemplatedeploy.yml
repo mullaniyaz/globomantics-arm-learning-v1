@@ -66,7 +66,7 @@ jobs:
           subscriptionId: 9f91d3ca-747b-4642-a795-c40a3d1f7bfd
           template: ./arm-templates/virtualmachine.json
           parameters: 
-            adminPassword="My$ecureP@ssword!"
+            adminPassword=${{ secrets.UBUNTU_ADMIN_PASSWORD }}
           deploymentMode: incremental
 
       # - name: Deploy Resource Group rg-githubactions with AZ CLI 'test'
